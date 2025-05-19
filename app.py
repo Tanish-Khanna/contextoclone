@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session, jsonify
 from flask_session import Session
 from randomWord import randomWord
-from score import scorer, glove_vocab
+from score import scorer
 import os
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ with open("wordlist/filtered_oxford_3000.txt", "r") as file:
 def reset_game():
     session.clear()
     session['target_word'] = randomWord()
-    session['rankings'] = generate_rankings(session['target_word'], glove_vocab)
+    session['rankings'] = generate_rankings(session['target_word'], word_list)
     session['guesses'] = []
     return render_template('index.html')
 
@@ -32,10 +32,10 @@ def guess():
     user_guess = data.get('guess', '').strip().lower()
 
     
-    if user_guess not in word_list and user_guess not in glove_vocab:
+    if user_guess not in word_list and user_guess not in word_list:
         return jsonify({'feedback': f"'{user_guess}' is not in the vocabulary. Try a different word.", 'correct': False})
 
-    if scorer(user_guess, session['target_word'], glove_vocab):
+    if scorer(user_guess, session['target_word'], word_list):
         feedback = f"🎉 Correct! The word was '{session['target_word']}'."
         session.pop('target_word')
         return jsonify({'feedback': feedback, 'correct': True})
@@ -82,7 +82,7 @@ def giveup():
 def play_again():
     session.clear()
     session['target_word'] = randomWord()
-    session['rankings'] = generate_rankings(session['target_word'], glove_vocab)
+    session['rankings'] = generate_rankings(session['target_word'], word_list)
     session['guesses'] = []
     return jsonify({
         'message': 'game reset',
