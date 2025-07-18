@@ -3,6 +3,7 @@ from flask_session import Session
 from randomWord import randomWord
 from score import scorer
 import os
+import config
 
 app = Flask(__name__)
 
@@ -104,4 +105,5 @@ def generate_rankings(target_word, vocab):
     return {word: rank + 1 for rank, (word, _) in enumerate(sorted_words)}
 
 if __name__ == "__main__":
-    app.run(debug=True) #get rid of this if i decide to do anything with this later
+    # The debug flag is controlled via the FLASK_DEBUG environment variable.
+    app.run(debug=config.FLASK_DEBUG)
