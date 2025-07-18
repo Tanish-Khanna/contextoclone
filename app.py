@@ -32,7 +32,7 @@ def guess():
     user_guess = data.get('guess', '').strip().lower()
 
     
-    if user_guess not in word_list and user_guess not in word_list:
+    if user_guess not in word_list:
         return jsonify({'feedback': f"'{user_guess}' is not in the vocabulary. Try a different word.", 'correct': False})
 
     if scorer(user_guess, session['target_word']):
