@@ -73,7 +73,6 @@ button[type="submit"]:hover {
 button#hint-button {
     background-color: #6c5ce7;
     color: #f3f3f3;
-    margin-right: 1rem;
 }
 
 button#hint-button:hover {
@@ -135,16 +134,16 @@ button#play-again-button:hover {
 .guess-item div {
     height: 1rem;
     background-color: #6c5ce7;
-    flex-grow: 1;
     margin-left: 1rem;
     border-radius: 5px;
 }
 .guess-bar {
     height: 1rem;
     background-color: #6c5ce7;
-    flex-grow: 1;
     margin: 0 1rem;
     border-radius: 5px;
+    flex-grow: 0;
+    width: 0;
 }
 
 .hint-giveup-container {
@@ -152,6 +151,7 @@ button#play-again-button:hover {
     bottom: 10px; /* Sticks the container to the bottom of the viewport */
     display: flex;
     justify-content: center;
+    width: 100%;
     gap: 1rem; /* Space between buttons */
     padding: 10px;
     background-color: #1a1a1a; /* Match the background */
