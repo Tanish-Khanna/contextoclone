@@ -9,21 +9,21 @@
    <body>
       <div class="container">
          <h1 class="title">contexto clone</h1>
-         <p>made by <span class="info-highlight">tanish</span> | guesses: <span id="guess-count">0</span></p>
+         <p>guesses: <span id="guess-count">0</span></p>
          <form id="guess-form">
             <input type="text" id="guess-input" placeholder="type a word" autocomplete="on">
             <button type="submit">submit</button>
          </form>
          <div id="feedback"></div>
+         <div id="guess-list" class="hidden"></div>
          <div class="hint-giveup-container">
-        <button id="hint-button">hint</button>
-        <button id="giveup-button">give up</button>
-        <button id="play-again-button" class="hidden">play again</button>
-        </div>
-         <div id="guess-list"></div>
+            <button id="hint-button">hint</button>
+            <button id="giveup-button">give up</button>
+            <button id="play-again-button" class="hidden">play again</button>
+         </div>
          <div id="hint-list" class="hidden"></div>
          <div id="giveup-answer" class="hidden"></div>
-        </div>
+      </div>
       <script>
          const form = document.getElementById('guess-form');
          const feedback = document.getElementById('feedback');
@@ -34,8 +34,6 @@
          const hintList = document.getElementById('hint-list');
          const giveupAnswer = document.getElementById('giveup-answer');
          const guessCount = document.getElementById('guess-count');
-         
-         let guesses = 0;
          
          form.addEventListener('submit', async (event) => {
              event.preventDefault();
@@ -57,47 +55,45 @@
              if (result.correct) {
                 playAgainButton.classList.remove('hidden');
                 guessList.innerHTML = '';
-            } else {
-                //dynamic maxrank incase i change wordlist
-                const maxRank = result.guesses[result.guesses.length - 1][1]; 
-                const minRank = 1; 
-                guessList.innerHTML = result.guesses.map(([word, rank]) => {
-                    const barWidth = Math.max(0, 100 * (maxRank - rank) / (maxRank - minRank));
-                    return `
+                guessList.classList.add('hidden');
+            } else if (result.guesses) {
+                guessList.classList.remove('hidden');
+                guessList.innerHTML = result.guesses.map(({ word, rank, bar }) => `
                         <div class="guess-item">
-                            <span>${word}</span>
-                            <div class="guess-bar" style="width:${barWidth}%;"></div>
+                            <span class="guess-word">${word}</span>
+                            <div class="guess-bar-track">
+                                <div class="guess-bar" style="width:${bar}%;"></div>
+                            </div>
                             <span class="guess-rank">#${rank}</span>
                         </div>
-                    `;
-                }).join('');
-                guessCount.textContent = ++guesses;
+                    `).join('');
+                guessCount.textContent = result.guesses.length;
             }
 
             form.reset();
 });
          
          playAgainButton.addEventListener('click', async () => {
-             //reset game
              const response = await fetch('/playagain', {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' }
              });
              const result = await response.json();
          
-             //ui reset
              feedback.textContent = result.message;
-             [guessList, hintList, giveupAnswer].forEach(el => el.classList.add('hidden'));
-             playAgainButton.classList.add('hidden');
-             guessCount.textContent = guesses = 0;
+             guessList.innerHTML = '';
+             hintList.innerHTML = '';
+             giveupAnswer.textContent = '';
+             [guessList, hintList, giveupAnswer, playAgainButton].forEach(el => el.classList.add('hidden'));
+             guessCount.textContent = 0;
          });
          
          hintButton.addEventListener('click', async () => {
              if (!hintList.classList.toggle('hidden')) {
                  const response = await fetch('/hint');
                  const result = await response.json();
-                 hintList.innerHTML = result.hints.length 
-                     ? result.hints.map(hint => `<div>${hint.word}</div>`).join('') 
+                 hintList.innerHTML = result.hints.length
+                     ? result.hints.map(word => `<div>${word}</div>`).join('')
                      : 'No hints available.';
              }
          });
